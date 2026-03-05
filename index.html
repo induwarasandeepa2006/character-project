@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Viewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #1a1a2e;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 0, 128, 0.03) 2px,
+                    rgba(255, 0, 128, 0.03) 4px
+                );
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #16213e;
+            border: 4px solid #00fff7;
+            box-shadow: 
+                0 0 20px #00fff7,
+                inset 0 0 20px rgba(0, 255, 247, 0.1);
+            padding: 30px;
+            max-width: 650px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff0080 0%, #7928ca 100%);
+            border: 3px solid #00fff7;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            background: linear-gradient(45deg, #00fff7, #ff0080, #00fff7);
+            z-index: -1;
+            filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-shadow: 
+                2px 2px #ff0080,
+                4px 4px #7928ca;
+            line-height: 1.5;
+        }
+
+        .header p {
+            color: #00fff7;
+            font-size: 0.5em;
+            text-transform: uppercase;
+        }
+
+        .game-ui {
+            background: #0f3460;
+            border: 3px solid #ff0080;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #1a1a2e;
+            border: 2px solid #00fff7;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            color: #00fff7;
+            font-size: 0.5em;
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            color: #ff0080;
+            font-size: 0.8em;
+        }
+
+        .selector-group {
+            margin-bottom: 20px;
+        }
+
+        .selector-group label {
+            display: block;
+            color: #00fff7;
+            margin-bottom: 12px;
+            font-size: 0.7em;
+            text-transform: uppercase;
+        }
+
+        #character {
+            width: 100%;
+            padding: 15px;
+            font-size: 0.7em;
+            font-family: 'Press Start 2P', cursive;
+            border: 3px solid #ff0080;
+            background: #1a1a2e;
+            color: #00fff7;
+            cursor: pointer;
+        }
+
+        #character option {
+            background: #1a1a2e;
+            color: #00fff7;
+        }
+
+        .character-display {
+            text-align: center;
+            background: #1a1a2e;
+            border: 3px solid #00fff7;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .character-display::before {
+            content: '▶';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #ff0080;
+            font-size: 0.8em;
+        }
+
+        .character-display::after {
+            content: '◀';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ff0080;
+            font-size: 0.8em;
+        }
+
+        #characterImage {
+            max-width: 100%;
+            height: auto;
+            border: 3px solid #ff0080;
+            margin-bottom: 20px;
+            image-rendering: pixelated;
+        }
+
+        .character-info {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px dashed #00fff7;
+            display: none;
+        }
+
+        .character-info.active {
+            display: block;
+        }
+
+        .character-name {
+            color: #ff0080;
+            font-size: 1em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .character-description {
+            color: #00fff7;
+            font-size: 0.5em;
+            line-height: 1.8;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px;
+            border: 3px solid #00fff7;
+            font-size: 0.7em;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            background: linear-gradient(135deg, #7928ca 0%, #ff0080 100%);
+            color: #fff;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .counter {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: #1a1a2e;
+            border: 2px solid #ff0080;
+        }
+
+        .counter-text {
+            color: #00fff7;
+            font-size: 0.6em;
+        }
+
+        .level-indicator {
+            text-align: center;
+            margin-top: 15px;
+            color: #ff0080;
+            font-size: 0.5em;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1em;
+            }
+
+            button {
+                font-size: 0.5em;
+            }
+
+            .score-value {
+                font-size: 0.6em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RETRO ARCADE</h1>
+            <p>Character Select</p>
+        </div>
+
+        <div class="game-ui">
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-label">PLAYER</div>
+                    <div class="score-value">1P</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">LEVEL</div>
+                    <div class="score-value" id="levelDisplay">01</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">LIVES</div>
+                    <div class="score-value">♥♥♥</div>
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <label for="character">► SELECT CHARACTER</label>
+                <select id="character" onchange="changeImage()">
+                    <option value="garfield">GARFIELD</option>
+                    <option value="odie">ODIE</option>
+                    <option value="nermal">NERMAL</option>
+                    <option value="pooky">POOKY</option>
+                    <option value="jon">JON</option>
+                </select>
+            </div>
+
+            <div class="character-display">
+                <img id="characterImage" src="images/garfield.jpg" alt="Character">
+                <div class="character-info active" id="characterInfo">
+                    <div class="character-name" id="characterName">GARFIELD</div>
+                    <div class="character-description" id="characterDescription">
+                        The lazy orange tabby cat who loves lasagna and hates Mondays.
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button onclick="previousCharacter()">◄ PREV</button>
+                <button onclick="nextCharacter()">NEXT ►</button>
+            </div>
+
+            <div class="counter">
+                <span class="counter-text" id="counter">CHARACTER 1/5</span>
+            </div>
+
+            <div class="level-indicator">
+                ★ PRESS START TO CONTINUE ★
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
